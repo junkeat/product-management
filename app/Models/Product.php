@@ -44,6 +44,22 @@ class Product extends Model
             ->withTimestamps();
     }
 
+    // Mutator: trim whitespace from names
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => trim($value),
+        );
+    }
+
+    // Accessor: $product->formatted_price => "1,249.90"
+    protected function formattedPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => number_format((float) $this->price, 2),
+        );
+    }
+
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         $lowStockThreshold = 10;
