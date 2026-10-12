@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('product_supplier', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->constrained()->cascadeOnDelete();
+            $table->decimal('cost_price', 10, 2)->nullable();
+            $table->string('supplier_sku')->nullable();
             $table->timestamps();
+            $table->unique(['product_id', 'supplier_id']);
         });
     }
 
