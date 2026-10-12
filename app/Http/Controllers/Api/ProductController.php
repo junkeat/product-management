@@ -9,13 +9,12 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 
 class ProductController extends Controller
 {
-    public function index(IndexProductRequest $request): AnonymousResourceCollection
+    public function index(IndexProductRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -26,7 +25,7 @@ class ProductController extends Controller
             ->paginate($data['per_page'] ?? 15)
             ->withQueryString();
 
-        return ProductResource::collection($products);
+        return ProductResource::collection($products)->response();
     }
 
     public function store(StoreProductRequest $request): JsonResponse
@@ -45,12 +44,12 @@ class ProductController extends Controller
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function show(Product $product): ProductResource
+    public function show(Product $product): JsonResponse
     {
-        return ProductResource::make($product->load(['category', 'suppliers']));
+        return ProductResource::make($product->load(['category', 'suppliers']))->response();
     }
 
-    public function update(UpdateProductRequest $request, Product $product): ProductResource
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
         $data = $request->validated();
         $supplierIds = Arr::pull($data, 'supplier_ids');
@@ -61,13 +60,13 @@ class ProductController extends Controller
             $product->suppliers()->sync($supplierIds);
         }
 
-        return ProductResource::make($product->load(['category', 'suppliers']));
+        return ProductResource::make($product->load(['category', 'suppliers']))->response();
     }
 
-    public function destroy(Product $product): Response
+    public function destroy(Product $product): JsonResponse
     {
         $product->delete();
 
-        return response()->noContent();
+        return response()->json(['message' => 'Product deleted successfully.']);
     }
 }
