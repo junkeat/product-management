@@ -69,4 +69,19 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product deleted successfully.']);
     }
+
+    public function restore(Product $product): ProductResource
+    {
+        $product->restore();
+
+        return new ProductResource($product);
+    }
+
+    public function forceDelete(Product $product): Response
+    {
+        $product->suppliers()->detach();
+        $product->forceDelete();
+
+        return response()->noContent();
+    }
 }

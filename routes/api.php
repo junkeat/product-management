@@ -9,6 +9,11 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+    Route::post('products/{product}/restore', [ProductController::class, 'restore'])
+        ->withTrashed();
+
+    Route::delete('products/{product}/force', [ProductController::class, 'forceDelete'])
+        ->withTrashed();
 });
 
 Route::prefix('auth')->group(function () {
