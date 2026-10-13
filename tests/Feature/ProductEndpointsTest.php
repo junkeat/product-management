@@ -14,6 +14,58 @@ class ProductEndpointsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_products_dashboard_displays_all_products_and_summary_values(): void
+    {
+        $category = Category::factory()->create(['name' => 'Accessories']);
+        $inStock = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Wireless Keyboard',
+            'sku' => 'KEYBOARD-001',
+            'price' => 50,
+            'stock' => 8,
+            'is_active' => true,
+        ]);
+        Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'USB Hub',
+            'sku' => 'HUB-001',
+            'price' => 25,
+            'stock' => 0,
+            'is_active' => false,
+        ]);
+        Product::factory()->create([
+            'price' => 2,
+            'stock' => 50,
+        ]);
+
+        $response = $this->get(route('products.index'));
+
+        $response->assertOk()
+            ->assertSee('Wireless Keyboard')
+            ->assertSee('KEYBOARD-001')
+            ->assertSee('Accessories')
+            ->assertSee('USB Hub')
+            ->assertSee('Total products')
+            ->assertSee('Low stock');
+
+        $response->assertViewHas('products', function ($products) use ($inStock): bool {
+            return $products->count() === 3
+                && $products->firstWhere('id', $inStock->id)->relationLoaded('category');
+        });
+        $response->assertViewHas('totalProducts', 3);
+        $response->assertViewHas('inStockProducts', 2);
+        $response->assertViewHas('lowStockProducts', 1);
+        $response->assertViewHas('inventoryValue', 500);
+    }
+
+    public function test_products_dashboard_displays_an_empty_state(): void
+    {
+        $this->get(route('products.index'))
+            ->assertOk()
+            ->assertSee('No products yet')
+            ->assertViewHas('totalProducts', 0);
+    }
+
     public function test_products_can_be_listed(): void
     {
         Product::factory()->count(2)->create();
