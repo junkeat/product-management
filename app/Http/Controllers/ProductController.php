@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductController extends Controller
 {
@@ -45,6 +48,19 @@ class ProductController extends Controller
             'lowStockProducts' => $summary->low_stock_products,
             'inventoryValue' => $summary->inventory_value,
         ]);
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $filters = $request->validate([
+            'status' => ['nullable', 'in:active,inactive'],
+        ]);
+        $status = $filters['status'] ?? null;
+
+        return Excel::download(
+            new ProductsExport($status),
+            'products.xlsx'
+        );
     }
 
     public function edit(Product $product): View

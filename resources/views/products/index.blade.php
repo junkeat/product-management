@@ -40,7 +40,13 @@
                         <h1 class="text-3xl font-bold tracking-tight text-slate-950">Products</h1>
                         <p class="mt-2 text-sm text-slate-500">A complete overview of your product catalog.</p>
                     </div>
-                    <span class="text-sm text-slate-500">{{ now()->format('F j, Y') }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-500">{{ now()->format('F j, Y') }}</span>
+                        <a href="{{ route('products.export', array_filter(['status' => $status])) }}"
+                            class="inline-flex items-center gap-2 border rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-emerald-700">
+                            Export
+                        </a>
+                    </div>
                 </header>
 
                 <section class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Product summary">
