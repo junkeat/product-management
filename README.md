@@ -14,6 +14,7 @@ Run these commands in the terminal from the project folder:
 
 ```bash
 composer install
+npm install
 php artisan key:generate
 php artisan migrate --seed
 composer run dev
