@@ -66,8 +66,20 @@
                     <div class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-slate-900">All products</h2>
-                            <p class="mt-1 text-sm text-slate-500">Showing {{ number_format($totalProducts) }} products</p>
                         </div>
+                        <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap items-center gap-2">
+                            <label for="status" class="text-sm font-medium text-slate-600">Status</label>
+                            <select id="status" name="status"
+                                class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="" @selected($status === '')>All</option>
+                                <option value="active" @selected($status === 'active')>Active</option>
+                                <option value="inactive" @selected($status === 'inactive')>Inactive</option>
+                            </select>
+                            <button type="submit"
+                                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
+                                Apply
+                            </button>
+                        </form>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[760px] text-left text-sm">
@@ -120,6 +132,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if ($products->hasPages())
+                        <div class="border-t border-slate-200 px-6 py-4">
+                            {{ $products->links() }}
+                        </div>
+                    @endif
                 </section>
             </div>
         </main>
