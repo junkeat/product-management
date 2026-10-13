@@ -16,7 +16,7 @@ Run these commands in the terminal from the project folder:
 composer install
 php artisan key:generate
 php artisan migrate --seed
-php artisan serve
+composer run dev
 ```
 
 The default database is SQLite. To use another database, update the database settings in `.env`.
