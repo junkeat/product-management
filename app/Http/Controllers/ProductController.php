@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -63,16 +64,26 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Request $request, Product $product): RedirectResponse
+    public function bulkDestroy(Request $request): RedirectResponse
     {
-        $filters = $request->validate([
+        $data = $request->validate([
             'status' => ['nullable', 'in:active,inactive'],
+            'product_ids' => ['required', 'array', 'min:1'],
+            'product_ids.*' => [
+                'required',
+                'integer',
+                'distinct',
+                Rule::exists('products', 'id')->whereNull('deleted_at'),
+            ],
         ]);
 
-        $product->delete();
+        $products = Product::query()->whereKey($data['product_ids'])->get();
+        $deletedCount = $products->count();
+
+        $products->each(fn (Product $product) => $product->delete());
 
         return redirect()
-            ->route('products.index', array_filter($filters))
-            ->with('success', 'Product deleted successfully.');
+            ->route('products.index', array_filter(['status' => $data['status'] ?? null]))
+            ->with('success', "{$deletedCount} products deleted successfully.");
     }
 }

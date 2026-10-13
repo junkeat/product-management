@@ -74,31 +74,56 @@
                             {{ session('success') }}
                         </div>
                     @endif
+                    @if ($errors->any())
+                        <div role="alert"
+                            class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                            {{ $errors->first('product_ids') ?: $errors->first('product_ids.*') }}
+                        </div>
+                    @endif
                     <div
                         class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-slate-900">All products</h2>
                         </div>
-                        <form method="GET" action="{{ route('products.index') }}"
-                            class="flex flex-wrap items-center gap-2">
-                            <label for="status" class="text-sm font-medium text-slate-600">Status</label>
-                            <select id="status" name="status"
-                                class="rounded-lg border border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="" @selected($status === '')>All</option>
-                                <option value="active" @selected($status === 'active')>Active</option>
-                                <option value="inactive" @selected($status === 'inactive')>Inactive</option>
-                            </select>
-                            <button type="submit"
-                                class="rounded-lg border border-slate-300 bg-indigo-600 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
-                                Apply
-                            </button>
-                        </form>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <form method="GET" action="{{ route('products.index') }}"
+                                class="flex flex-wrap items-center gap-2">
+                                <label for="status" class="text-sm font-medium text-slate-600">Status</label>
+                                <select id="status" name="status"
+                                    class="rounded-lg border border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="" @selected($status === '')>All</option>
+                                    <option value="active" @selected($status === 'active')>Active</option>
+                                    <option value="inactive" @selected($status === 'inactive')>Inactive</option>
+                                </select>
+                                <button type="submit"
+                                    class="rounded-lg border border-slate-300 bg-indigo-600 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
+                                    Apply
+                                </button>
+                            </form>
+                            <form id="bulk-delete-form" method="POST" action="{{ route('products.bulk-destroy') }}"
+                                onsubmit="return confirm('Delete the selected products?');">
+                                @csrf
+                                @if ($status !== '')
+                                    <input type="hidden" name="status" value="{{ $status }}">
+                                @endif
+                                <button id="bulk-delete-button" type="submit" disabled
+                                    class="rounded-lg border border-rose-200 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[760px] text-left text-sm">
                             <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                                 <tr>
-                                    <th scope="col" class="px-6 py-4 font-semibold">Product</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">
+                                        <div class="flex items-center gap-3">
+                                            <input id="select-all-products" type="checkbox" aria-label="Select all products on this page"
+                                                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                            <span>Product</span>
+                                        </div>
+                                    </th>
                                     <th scope="col" class="px-6 py-4 font-semibold">Category</th>
                                     <th scope="col" class="px-6 py-4 font-semibold">Price</th>
                                     <th scope="col" class="px-6 py-4 font-semibold">Stock</th>
@@ -110,8 +135,16 @@
                                 @forelse ($products as $product)
                                     <tr class="transition hover:bg-slate-50/70">
                                         <td class="px-6 py-4">
-                                            <p class="font-semibold text-slate-900">{{ $product->name }}</p>
-                                            <p class="mt-1 text-xs text-slate-500">SKU: {{ $product->sku }}</p>
+                                            <div class="flex items-center gap-3">
+                                                <input type="checkbox" name="product_ids[]" value="{{ $product->id }}"
+                                                    form="bulk-delete-form" data-product-selection
+                                                    aria-label="Select {{ $product->name }}"
+                                                    class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                                <div>
+                                                    <p class="font-semibold text-slate-900">{{ $product->name }}</p>
+                                                    <p class="mt-1 text-xs text-slate-500">SKU: {{ $product->sku }}</p>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-slate-600">{{ $product->category->name }}</td>
                                         <td class="px-6 py-4 font-medium text-slate-900">
@@ -144,20 +177,6 @@
                                                     class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
                                                     Edit
                                                 </a>
-                                                <form method="POST"
-                                                    action="{{ route('products.destroy', $product) }}" class="inline"
-                                                    onsubmit="return confirm('Remove this product from the catalog?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    @if ($status !== '')
-                                                        <input type="hidden" name="status"
-                                                            value="{{ $status }}">
-                                                    @endif
-                                                    <button type="submit"
-                                                        class="ml-1 inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
-                                                        Delete
-                                                    </button>
-                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -182,6 +201,29 @@
             </div>
         </main>
     </div>
+    <script>
+        const selectAllProducts = document.getElementById('select-all-products');
+        const productSelections = [...document.querySelectorAll('[data-product-selection]')];
+        const bulkDeleteButton = document.getElementById('bulk-delete-button');
+
+        const updateBulkDeleteState = () => {
+            const selectedCount = productSelections.filter((checkbox) => checkbox.checked).length;
+            bulkDeleteButton.disabled = selectedCount === 0;
+            selectAllProducts.checked = productSelections.length > 0 && selectedCount === productSelections.length;
+            selectAllProducts.indeterminate = selectedCount > 0 && selectedCount < productSelections.length;
+        };
+
+        selectAllProducts.addEventListener('change', () => {
+            productSelections.forEach((checkbox) => {
+                checkbox.checked = selectAllProducts.checked;
+            });
+            updateBulkDeleteState();
+        });
+
+        productSelections.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateBulkDeleteState);
+        });
+    </script>
 </body>
 
 </html>
