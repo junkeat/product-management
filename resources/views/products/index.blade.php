@@ -46,6 +46,13 @@
                             class="inline-flex items-center gap-2 border rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-emerald-700">
                             Export
                         </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                                Sign out
+                            </button>
+                        </form>
                     </div>
                 </header>
 
