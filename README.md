@@ -12,7 +12,7 @@ Add .env file and update it as depending on your setup
 
 Run these commands in the terminal from the project folder:
 
-```powershell
+```bash
 composer install
 php artisan key:generate
 php artisan migrate --seed
