@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Products · Product Management</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+    <div class="min-h-screen lg:flex">
+        <aside class="bg-slate-950 px-6 py-7 text-white lg:flex lg:w-64 lg:flex-col">
+            <a href="{{ route('products.index') }}" class="flex items-center gap-3 text-lg font-semibold tracking-tight">
+                <span
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500 text-sm font-bold">PM</span>
+                Product Manager
+            </a>
+
+            <p class="mb-3 mt-10 text-xs font-semibold uppercase tracking-widest text-slate-500">Workspace</p>
+            <nav aria-label="Main navigation">
+                <a href="{{ route('products.index') }}" aria-current="page"
+                    class="flex items-center gap-3 rounded-xl bg-slate-800 px-4 py-3 text-sm font-medium text-white">
+                    <svg class="h-5 w-5 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 7.75 7.5 4.5 7.5-4.5M12 12.5V21" />
+                    </svg>
+                    Products
+                </a>
+            </nav>
+            <p class="mt-auto hidden pt-12 text-xs text-slate-500 lg:block">Inventory overview</p>
+        </aside>
+
+        <main class="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10">
+            <div class="mx-auto max-w-7xl">
+                <header class="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="mb-2 text-sm font-medium text-indigo-600">Inventory</p>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-950">Products</h1>
+                        <p class="mt-2 text-sm text-slate-500">A complete overview of your product catalog.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-500">{{ now()->format('F j, Y') }}</span>
+                        <a href="{{ route('products.export', array_filter(['status' => $status])) }}"
+                            class="inline-flex items-center gap-2 border rounded-lg px-4 py-2.5 text-sm font-medium shadow-sm transition hover:bg-emerald-700">
+                            Export
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                                Sign out
+                            </button>
+                        </form>
+                    </div>
+                </header>
+
+                <section class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Product summary">
+                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p class="text-sm font-medium text-slate-500">Total products</p>
+                        <p class="mt-3 text-3xl font-semibold tracking-tight">{{ number_format($totalProducts) }}</p>
+                        <p class="mt-1 text-xs text-slate-400">In your catalog</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p class="text-sm font-medium text-slate-500">In stock</p>
+                        <p class="mt-3 text-3xl font-semibold tracking-tight">{{ number_format($inStockProducts) }}</p>
+                        <p class="mt-1 text-xs text-slate-400">Products with available units</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p class="text-sm font-medium text-slate-500">Low stock</p>
+                        <p class="mt-3 text-3xl font-semibold tracking-tight">{{ number_format($lowStockProducts) }}</p>
+                        <p class="mt-1 text-xs text-slate-400">10 units or fewer</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p class="text-sm font-medium text-slate-500">Inventory value</p>
+                        <p class="mt-3 text-3xl font-semibold tracking-tight">${{ number_format($inventoryValue, 2) }}
+                        </p>
+                        <p class="mt-1 text-xs text-slate-400">Price × available units</p>
+                    </article>
+                </section>
+
+                <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    @if (session('success'))
+                        <div role="status"
+                            class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div role="alert"
+                            class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                            {{ $errors->first('product_ids') ?: $errors->first('product_ids.*') }}
+                        </div>
+                    @endif
+                    <div
+                        class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-900">All products</h2>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <form method="GET" action="{{ route('products.index') }}"
+                                class="flex flex-wrap items-center gap-2">
+                                <label for="status" class="text-sm font-medium text-slate-600">Status</label>
+                                <select id="status" name="status"
+                                    class="rounded-lg border border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="" @selected($status === '')>All</option>
+                                    <option value="active" @selected($status === 'active')>Active</option>
+                                    <option value="inactive" @selected($status === 'inactive')>Inactive</option>
+                                </select>
+                                <button type="submit"
+                                    class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
+                                    Apply
+                                </button>
+                            </form>
+                            <form id="bulk-delete-form" method="POST" action="{{ route('products.bulk-destroy') }}"
+                                onsubmit="return confirm('Delete the selected products?');">
+                                @csrf
+                                @if ($status !== '')
+                                    <input type="hidden" name="status" value="{{ $status }}">
+                                @endif
+                                <button id="bulk-delete-button" type="submit" disabled
+                                    class="rounded-lg border border-rose-200 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[760px] text-left text-sm">
+                            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-semibold">
+                                        <div class="flex items-center gap-3">
+                                            <input id="select-all-products" type="checkbox" aria-label="Select all products on this page"
+                                                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                            <span>Product</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Category</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Price</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Stock</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Status</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @forelse ($products as $product)
+                                    <tr class="transition hover:bg-slate-50/70">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <input type="checkbox" name="product_ids[]" value="{{ $product->id }}"
+                                                    form="bulk-delete-form" data-product-selection
+                                                    aria-label="Select {{ $product->name }}"
+                                                    class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                                <div>
+                                                    <p class="font-semibold text-slate-900">{{ $product->name }}</p>
+                                                    <p class="mt-1 text-xs text-slate-500">SKU: {{ $product->sku }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-600">{{ $product->category->name }}</td>
+                                        <td class="px-6 py-4 font-medium text-slate-900">
+                                            ${{ number_format((float) $product->price, 2) }}</td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="font-medium text-slate-900">{{ number_format($product->stock) }}</span>
+                                            <span class="ml-1 text-xs text-slate-500">
+                                                @if ($product->stock === 0)
+                                                    units · Out of stock
+                                                @elseif ($product->stock <= 10)
+                                                    units · Low
+                                                @else
+                                                    units
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if ($product->is_active)
+                                                <span
+                                                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Active</span>
+                                            @else
+                                                <span
+                                                    class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex">
+                                                <a href="{{ route('products.edit', $product) }}"
+                                                    class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
+                                                    Edit
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-16 text-center">
+                                            <p class="font-semibold text-slate-900">No products yet</p>
+                                            <p class="mt-1 text-sm text-slate-500">Products will appear here once they
+                                                are added to your catalog.</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    @if ($products->hasPages())
+                        <div class="border-t border-slate-200 px-6 py-4">
+                            {{ $products->links() }}
+                        </div>
+                    @endif
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+        const selectAllProducts = document.getElementById('select-all-products');
+        const productSelections = [...document.querySelectorAll('[data-product-selection]')];
+        const bulkDeleteButton = document.getElementById('bulk-delete-button');
+
+        const updateBulkDeleteState = () => {
+            const selectedCount = productSelections.filter((checkbox) => checkbox.checked).length;
+            bulkDeleteButton.disabled = selectedCount === 0;
+            selectAllProducts.checked = productSelections.length > 0 && selectedCount === productSelections.length;
+            selectAllProducts.indeterminate = selectedCount > 0 && selectedCount < productSelections.length;
+        };
+
+        selectAllProducts.addEventListener('change', () => {
+            productSelections.forEach((checkbox) => {
+                checkbox.checked = selectAllProducts.checked;
+            });
+            updateBulkDeleteState();
+        });
+
+        productSelections.forEach((checkbox) => {
+            checkbox.addEventListener('change', updateBulkDeleteState);
+        });
+    </script>
+</body>
+
+</html>

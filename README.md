@@ -12,11 +12,11 @@ Add .env file and update it as depending on your setup
 
 Run these commands in the terminal from the project folder:
 
-```powershell
+```bash
 composer install
 php artisan key:generate
 php artisan migrate --seed
-php artisan serve
+composer run dev
 ```
 
 The default database is SQLite. To use another database, update the database settings in `.env`.
@@ -28,6 +28,10 @@ The seeders add 3 categories, 2 suppliers, 10 products, and a local admin accoun
 
 Use this account for local development only.
 
+## Products dashboard
+
+Open [http://127.0.0.1:8000/products](http://127.0.0.1:8000/products) to view the product dashboard, including inventory summaries and the complete product list.
+
 ## API documentation
 
 Open these URLs after you start the local server:
@@ -36,4 +40,3 @@ Open these URLs after you start the local server:
 - OpenAPI JSON: [http://127.0.0.1:8000/docs/api.json](http://127.0.0.1:8000/docs/api.json)
 
 Documentation routes are available in the local environment by default.
-
