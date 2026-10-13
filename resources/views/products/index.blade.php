@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Products · Product Management</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
     <div class="min-h-screen lg:flex">
         <aside class="bg-slate-950 px-6 py-7 text-white lg:flex lg:w-64 lg:flex-col">
             <a href="{{ route('products.index') }}" class="flex items-center gap-3 text-lg font-semibold tracking-tight">
-                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500 text-sm font-bold">PM</span>
+                <span
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500 text-sm font-bold">PM</span>
                 Product Manager
             </a>
 
@@ -18,7 +21,8 @@
             <nav aria-label="Main navigation">
                 <a href="{{ route('products.index') }}" aria-current="page"
                     class="flex items-center gap-3 rounded-xl bg-slate-800 px-4 py-3 text-sm font-medium text-white">
-                    <svg class="h-5 w-5 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <svg class="h-5 w-5 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 7.75 7.5 4.5 7.5-4.5M12 12.5V21" />
                     </svg>
@@ -57,22 +61,26 @@
                     </article>
                     <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                         <p class="text-sm font-medium text-slate-500">Inventory value</p>
-                        <p class="mt-3 text-3xl font-semibold tracking-tight">${{ number_format($inventoryValue, 2) }}</p>
+                        <p class="mt-3 text-3xl font-semibold tracking-tight">${{ number_format($inventoryValue, 2) }}
+                        </p>
                         <p class="mt-1 text-xs text-slate-400">Price × available units</p>
                     </article>
                 </section>
 
                 <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                     @if (session('success'))
-                        <div role="status" class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                        <div role="status"
+                            class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
                             {{ session('success') }}
                         </div>
                     @endif
-                    <div class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div
+                        class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-slate-900">All products</h2>
                         </div>
-                        <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap items-center gap-2">
+                        <form method="GET" action="{{ route('products.index') }}"
+                            class="flex flex-wrap items-center gap-2">
                             <label for="status" class="text-sm font-medium text-slate-600">Status</label>
                             <select id="status" name="status"
                                 class="rounded-lg border border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -106,9 +114,11 @@
                                             <p class="mt-1 text-xs text-slate-500">SKU: {{ $product->sku }}</p>
                                         </td>
                                         <td class="px-6 py-4 text-slate-600">{{ $product->category->name }}</td>
-                                        <td class="px-6 py-4 font-medium text-slate-900">${{ number_format((float) $product->price, 2) }}</td>
+                                        <td class="px-6 py-4 font-medium text-slate-900">
+                                            ${{ number_format((float) $product->price, 2) }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="font-medium text-slate-900">{{ number_format($product->stock) }}</span>
+                                            <span
+                                                class="font-medium text-slate-900">{{ number_format($product->stock) }}</span>
                                             <span class="ml-1 text-xs text-slate-500">
                                                 @if ($product->stock === 0)
                                                     units · Out of stock
@@ -121,36 +131,42 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             @if ($product->is_active)
-                                                <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Active</span>
+                                                <span
+                                                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Active</span>
                                             @else
-                                                <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Inactive</span>
+                                                <span
+                                                    class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Inactive</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4">
-                                            <a href="{{ route('products.edit', $product) }}"
-                                                class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
-                                                Edit
-                                            </a>
-                                            <form method="POST" action="{{ route('products.destroy', $product) }}"
-                                                class="inline"
-                                                onsubmit="return confirm('Remove this product from the catalog?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                @if ($status !== '')
-                                                    <input type="hidden" name="status" value="{{ $status }}">
-                                                @endif
-                                                <button type="submit"
-                                                    class="ml-1 inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
-                                                    Delete
-                                                </button>
-                                            </form>
+                                            <div class="flex">
+                                                <a href="{{ route('products.edit', $product) }}"
+                                                    class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
+                                                    Edit
+                                                </a>
+                                                <form method="POST"
+                                                    action="{{ route('products.destroy', $product) }}" class="inline"
+                                                    onsubmit="return confirm('Remove this product from the catalog?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    @if ($status !== '')
+                                                        <input type="hidden" name="status"
+                                                            value="{{ $status }}">
+                                                    @endif
+                                                    <button type="submit"
+                                                        class="ml-1 inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="6" class="px-6 py-16 text-center">
                                             <p class="font-semibold text-slate-900">No products yet</p>
-                                            <p class="mt-1 text-sm text-slate-500">Products will appear here once they are added to your catalog.</p>
+                                            <p class="mt-1 text-sm text-slate-500">Products will appear here once they
+                                                are added to your catalog.</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -167,4 +183,5 @@
         </main>
     </div>
 </body>
+
 </html>
