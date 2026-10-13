@@ -6,6 +6,7 @@ This Laravel API manages products, categories, and suppliers. It supports produc
 
 - PHP 8.2 or later
 - Composer
+- NodeJS v20 or later
 
 ## Setup
 Add .env file and update it as depending on your setup
