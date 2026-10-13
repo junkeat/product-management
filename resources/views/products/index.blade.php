@@ -131,6 +131,19 @@
                                                 class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
                                                 Edit
                                             </a>
+                                            <form method="POST" action="{{ route('products.destroy', $product) }}"
+                                                class="inline"
+                                                onsubmit="return confirm('Remove this product from the catalog?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                @if ($status !== '')
+                                                    <input type="hidden" name="status" value="{{ $status }}">
+                                                @endif
+                                                <button type="submit"
+                                                    class="ml-1 inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
+                                                    Delete
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty

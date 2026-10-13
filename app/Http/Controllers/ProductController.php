@@ -62,4 +62,17 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('success', 'Product updated successfully.');
     }
+
+    public function destroy(Request $request, Product $product): RedirectResponse
+    {
+        $filters = $request->validate([
+            'status' => ['nullable', 'in:active,inactive'],
+        ]);
+
+        $product->delete();
+
+        return redirect()
+            ->route('products.index', array_filter($filters))
+            ->with('success', 'Product deleted successfully.');
+    }
 }
