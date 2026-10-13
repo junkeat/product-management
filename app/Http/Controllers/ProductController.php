@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProductRequest;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -41,5 +44,22 @@ class ProductController extends Controller
             'lowStockProducts' => $summary->low_stock_products,
             'inventoryValue' => $summary->inventory_value,
         ]);
+    }
+
+    public function edit(Product $product): View
+    {
+        return view('products.edit', [
+            'product' => $product,
+            'categories' => Category::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
+    {
+        $product->update($request->validated());
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product updated successfully.');
     }
 }

@@ -63,6 +63,11 @@
                 </section>
 
                 <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    @if (session('success'))
+                        <div role="status" class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <div class="flex flex-col gap-1 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="text-lg font-semibold text-slate-900">All products</h2>
@@ -70,13 +75,13 @@
                         <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap items-center gap-2">
                             <label for="status" class="text-sm font-medium text-slate-600">Status</label>
                             <select id="status" name="status"
-                                class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                class="rounded-lg border border-slate-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="" @selected($status === '')>All</option>
                                 <option value="active" @selected($status === 'active')>Active</option>
                                 <option value="inactive" @selected($status === 'inactive')>Inactive</option>
                             </select>
                             <button type="submit"
-                                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
+                                class="rounded-lg border border-slate-300 bg-indigo-600 px-4 py-2 text-sm font-medium transition hover:bg-indigo-700">
                                 Apply
                             </button>
                         </form>
@@ -90,6 +95,7 @@
                                     <th scope="col" class="px-6 py-4 font-semibold">Price</th>
                                     <th scope="col" class="px-6 py-4 font-semibold">Stock</th>
                                     <th scope="col" class="px-6 py-4 font-semibold">Status</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -120,10 +126,16 @@
                                                 <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Inactive</span>
                                             @endif
                                         </td>
+                                        <td class="px-6 py-4">
+                                            <a href="{{ route('products.edit', $product) }}"
+                                                class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700">
+                                                Edit
+                                            </a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-16 text-center">
+                                        <td colspan="6" class="px-6 py-16 text-center">
                                             <p class="font-semibold text-slate-900">No products yet</p>
                                             <p class="mt-1 text-sm text-slate-500">Products will appear here once they are added to your catalog.</p>
                                         </td>
